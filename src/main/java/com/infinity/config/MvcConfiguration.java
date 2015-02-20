@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
@@ -27,8 +29,20 @@ import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
 @EnableSpringDataWebSupport
 @EnableJpaRepositories("com.infinity.data.jpa.service")
 @Import({ SecurityConfig.class })
+@ImportResource("classpath:/src/main/resources/application.properties")
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
-        
+    
+    @Value("${jdbc.url}")
+    private String url;
+
+    @Value("${jdbc.username}")
+    private String username;
+
+    @Value("${jdbc.password}")
+    private String password;
+    
+    
+    
     private static final List<String> DEFAULT_TILES_DEFINITIONS = new LinkedList<> ();
     static 
     {
@@ -38,14 +52,14 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     }
     
     
-    @Bean(name="dataSopurce")
+    @Bean
     public DataSource dataSource() {
 
         DataSource dataSource = new DataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/devhub?zeroDateTimeBehavior=convertToNull");
-        dataSource.setUsername("root");
-        dataSource.setPassword("root");
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
 
         return dataSource;
 
@@ -86,11 +100,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
         return jpaTransactionManager;
     
     }
-
-   
-
-    
-    
+  
     @Bean
     public TilesViewResolver tilesViewResolver(){
     
